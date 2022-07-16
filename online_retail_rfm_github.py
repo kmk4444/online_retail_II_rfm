@@ -129,6 +129,7 @@ rfm.head()
 ############################### TASK 5 ###############################
 
 # Analyze segments
+#graph 1
 
 colors  = ("darkorange", "darkseagreen", "orange", "cyan", "cadetblue", "hotpink", "lightsteelblue", "coral",  "mediumaquamarine","palegoldenrod")
 explodes = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
@@ -142,3 +143,51 @@ rfm["segment"].value_counts(sort=False).plot.pie(colors=colors,
                                                  shadow = True,
                                                  explode = explodes)
 plt.ylabel("");
+
+# Graph - 2 
+
+rfm_coordinates = {"champions": [3, 5, 0.8, 1],
+                   "loyal_customers": [3, 5, 0.4, 0.8],
+                   "cant_loose": [4, 5, 0, 0.4],
+                   "at_Risk": [2, 4, 0, 0.4],
+                   "hibernating": [0, 2, 0, 0.4],
+                   "about_to_sleep": [0, 2, 0.4, 0.6],
+                   "promising": [0, 1, 0.6, 0.8],
+                   "new_customers": [0, 1, 0.8, 1],
+                   "potential_loyalists": [1, 3, 0.6, 1],
+                   "need_attention": [2, 3, 0.4, 0.6]}
+
+fig, ax = plt.subplots(figsize=(20, 10))
+
+ax.set_xlim([0, 5])
+ax.set_ylim([0, 5])
+
+plt.rcParams["axes.facecolor"] = "white"
+palette = ["#282828", "#04621B", "#971194", "#F1480F", "#4C00FF",
+           "#FF007B", "#9736FF", "#8992F3", "#B29800", "#80004C"]
+
+for key, color in zip(rfm_coordinates.keys(), palette[:10]):
+    coordinates = rfm_coordinates[key]
+    ymin, ymax, xmin, xmax = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
+
+    ax.axhspan(ymin=ymin, ymax=ymax, xmin=xmin, xmax=xmax, facecolor=color)
+
+    users = rfm[rfm.segment == key].shape[0]
+    users_percentage = (rfm[rfm.segment == key].shape[0] / rfm.shape[0]) * 100
+    avg_monetary = rfm[rfm.segment == key]["Monetary"].mean()
+
+    user_txt = "\n\nTotal Users: " + str(users) + "(" + str(round(users_percentage, 2)) + "%)"
+    monetary_txt = "\n\n\n\nAverage Monetary: " + str(round(avg_monetary, 2))
+
+    x = 5 * (xmin + xmax) / 2
+    y = (ymin + ymax) / 2
+
+    plt.text(x=x, y=y, s=key, ha="center", va="center", fontsize=18, color="white", fontweight="bold")
+    plt.text(x=x, y=y, s=user_txt, ha="center", va="center", fontsize=14, color="white")
+    plt.text(x=x, y=y, s=monetary_txt, ha="center", va="center", fontsize=14, color="white")
+
+    ax.set_xlabel("Recency Score")
+    ax.set_ylabel("Frequency Score")
+
+sns.despine(left=True, bottom=True)
+plt.show()
